@@ -1,6 +1,6 @@
 const QRCode = require('qrcode');
 
-const url = 'https://camera-app-production-6cc4.up.railway.app/index.html';
+const url = 'camera-app-production-6cc4.up.railway.app';
 
 QRCode.toFile('qr.png', url, { errorCorrectionLevel: 'H' }, err => {
     if (err) console.error(err);
