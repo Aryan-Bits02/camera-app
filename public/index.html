@@ -28,7 +28,7 @@
   <div id="msg">Waiting for camera...</div>
 
   <!-- Hidden video element that actually holds the stream -->
-  <video id="cam" autoplay playsinline muted style="display:none;"></video>
+  <video id="cam" autoplay playsinline muted style="width:1px;height:1px;opacity:0;position:absolute;"></video>
 
   <!-- Socket.io client -->
   <script src="/socket.io/socket.io.js"></script>
@@ -50,6 +50,7 @@
         });
 
         video.srcObject = stream;
+        await video.play();
         msg.textContent = "✅ Camera started – streaming...";
         console.log('Camera stream ready');
 
