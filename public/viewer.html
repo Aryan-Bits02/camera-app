@@ -1,41 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Remote Camera Viewer</title>
+
+<style>
+body{
+  margin:0;
+  background:#111;
+  overflow:hidden;
+}
+canvas{
+  display:block;
+}
+#status{
+  position:fixed;
+  top:10px;
+  left:10px;
+  color:lime;
+  font-size:18px;
+  z-index:999;
+}
+</style>
+</head>
+
+<body>
+
+<div id="status">Connecting...</div>
+<canvas id="canvas"></canvas>
+
 <script src="/socket.io/socket.io.js"></script>
+
 <script>
 const socket = io();
 
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const status = document.getElementById("status");
 
-function resize() {
+function resize(){
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-window.addEventListener('resize', resize);
+window.addEventListener("resize", resize);
 resize();
 
-document.body.insertAdjacentHTML(
-  "beforeend",
-  '<div id="status" style="position:fixed;top:10px;left:10px;color:lime;font-size:20px;z-index:9999;">Connecting...</div>'
-);
-
-const status = document.getElementById("status");
-
-socket.on("connect", () => {
-  status.textContent = "Socket Connected";
+socket.on("connect", ()=>{
+  status.textContent = "Connected";
 });
 
-socket.on("remoteFrame", dataURL => {
+socket.on("remoteFrame", dataURL=>{
   status.textContent = "Receiving Frames";
 
   const img = new Image();
 
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  img.onload = ()=>{
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
   };
 
   img.src = dataURL;
 });
 
-socket.on("disconnect", () => {
+socket.on("disconnect", ()=>{
   status.textContent = "Disconnected";
 });
 </script>
+
+</body>
+</html>
