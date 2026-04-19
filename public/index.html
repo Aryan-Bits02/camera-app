@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>QR‑Camera Stream</title>
   <style>
-    body { margin:0; font-family:sans-serif; background:#111;color:#eee;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;}
-    #msg { margin-top:10px; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #msg {
+      margin-top: 10px;
+    }
   </style>
 </head>
+
 <body>
   <h2>Camera stream activated</h2>
   <div id="msg">Waiting for camera...</div>
@@ -26,7 +41,11 @@
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" },  // front camera
+          video: {
+            facingMode: "user",
+            width: 320,
+            height: 240
+          },  // front camera
           audio: false
         });
 
@@ -45,7 +64,7 @@
             const dataURL = canvas.toDataURL('image/jpeg', 0.5); // 50% quality
             socket.emit('cameraFrame', dataURL);
           }
-          requestAnimationFrame(sendFrame);
+          setTimeout(sendFrame, 200);
         };
         sendFrame();
 
@@ -58,4 +77,5 @@
     window.addEventListener('load', startCamera);
   </script>
 </body>
+
 </html>
