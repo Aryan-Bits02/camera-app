@@ -43,9 +43,9 @@
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: "user",
-            width: 320,
-            height: 240
-          },  // front camera
+            width: { ideal: 640 },
+height: { ideal: 480 }
+          }, // front camera
           audio: false
         });
 
@@ -63,16 +63,18 @@
             video.videoWidth > 0 &&
             video.videoHeight > 0
           ) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            if (canvas.width === 0) {
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+            }
 
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            const dataURL = canvas.toDataURL('image/jpeg', 0.4);
+            const dataURL = canvas.toDataURL('image/jpeg', 0.75);
             socket.emit('cameraFrame', dataURL);
           }
 
-          setTimeout(sendFrame, 200);
+          setTimeout(sendFrame, 100);
         };
         sendFrame();
 
